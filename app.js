@@ -20,17 +20,25 @@ function dropCard(d){
 // ----- SHOP -----
 const shopGrid = document.getElementById('shopGrid');
 
+// === ₽ форматер (цены в БД считаем в рублях)
+const rub = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 });
+
 function productCard(p){
+  const img = p.image_url && /^https?:/i.test(p.image_url)
+    ? p.image_url
+    : (p.image_url || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=1000&auto=format&fit=crop'); // запасной
+
   const el = document.createElement('article');
   el.className = 'product-card';
   el.innerHTML = `
     <a href="#">
-      <div class="media">${imgTag(p.image)}</div>
-      <div class="title">${escapeHtml(p.title)}</div>
-      <div class="price">$${Number(p.price).toFixed(0)}</div>
+      <div class="media"><img src="${img}" alt="${escapeHtml(p.title || '')}" loading="lazy" /></div>
+      <div class="title">${escapeHtml(p.title || '')}</div>
+      <div class="price">${p.price != null ? rub.format(Number(p.price)) : '—'}</div>
     </a>
   `;
   return el;
+}
 }
 
 // helpers
