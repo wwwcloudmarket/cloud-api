@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cloud Market — Raffles</title>
+  <meta name="description" content="Розыгрыши и дропы бренда. Участвуй и побеждай." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- Шапка -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="#">Cloud<span>Market</span></a>
+
+      <nav class="nav">
+        <a href="#features">Преимущества</a>
+        <a href="#raffles">Розыгрыши</a>
+        <a href="#contacts">Контакты</a>
+      </nav>
+
+      <button class="burger" aria-label="Открыть меню" id="burgerBtn">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <nav class="mobile-nav" id="mobileNav" aria-label="Мобильное меню">
+      <a href="#features">Преимущества</a>
+      <a href="#raffles">Розыгрыши</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+  </header>
+
+  <!-- Хиро-блок -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <h1>Стильные дропы и честные рафлы</h1>
+        <p>Участвуй в новых релизах бренда и выигрывай право на покупку лимитированных моделей.</p>
+        <div class="hero-cta">
+          <a href="#raffles" class="btn btn-primary">Участвовать</a>
+          <a href="#features" class="btn btn-secondary">Как это работает</a>
+        </div>
+        <div class="status" id="statusBar" aria-live="polite">Проверяем статус…</div>
+      </div>
+
+      <div class="hero-art" aria-hidden="true">
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+        <div class="blob b3"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Преимущества -->
+  <section class="section" id="features">
+    <div class="container">
+      <h2 class="section-title">Почему именно мы</h2>
+      <div class="grid three">
+        <article class="card">
+          <h3>Честная система</h3>
+          <p>Прозрачные правила участия и случайный выбор победителей.</p>
+        </article>
+        <article class="card">
+          <h3>Лимитированные релизы</h3>
+          <p>Только свежие и ограниченные коллекции — попади в число первых.</p>
+        </article>
+        <article class="card">
+          <h3>Удобно с телефона</h3>
+          <p>Сайт адаптирован под смартфоны — участвуй в пару касаний.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Рафлы -->
+  <section class="section" id="raffles">
+    <div class="container">
+      <h2 class="section-title">Актуальные розыгрыши</h2>
+
+      <div class="grid two" id="rafflesList" aria-live="polite">
+        <!-- JS сюда подставит карточки -->
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid two">
+        <div class="card">
+          <h3>Как это работает</h3>
+          <ol class="steps">
+            <li>Заполни форму: контакт и размер.</li>
+            <li>Дождись подведения итогов.</li>
+            <li>Победители получают ссылку на оплату.</li>
+          </ol>
+        </div>
+
+        <form class="card form" id="raffleForm" novalidate>
+          <h3>Заявка на участие</h3>
+
+          <label class="field">
+            <span>Имя</span>
+            <input type="text" name="name" placeholder="Иван" required maxlength="60" />
+            <small class="error"></small>
+          </label>
+
+          <label class="field">
+            <span>Телеграм @</span>
+            <input type="text" name="telegram" placeholder="@username" required pattern="^@?[A-Za-z0-9_]{5,32}$" />
+            <small class="error"></small>
+          </label>
+
+          <label class="field">
+            <span>Размер</span>
+            <select name="size" required>
+              <option value="">Выберите размер…</option>
+              <option>S</option><option>M</option><option>L</option><option>XL</option>
+            </select>
+            <small class="error"></small>
+          </label>
+
+          <button type="submit" class="btn btn-primary" id="submitBtn">Участвовать</button>
+          <p class="muted" id="formHint">Отправляя заявку, ты соглашаешься с условиями розыгрыша.</p>
+          <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Контакты -->
+  <section class="section" id="contacts">
+    <div class="container">
+      <h2 class="section-title">Контакты</h2>
+      <div class="card">
+        <p>Вопросы по участию и коллабам: <a href="https://t.me/" target="_blank" rel="noreferrer">@cloudmarket_support</a></p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>© Cloud Market, <span id="year"></span></span>
+      <a href="#top">Наверх ↑</a>
+    </div>
+  </footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
