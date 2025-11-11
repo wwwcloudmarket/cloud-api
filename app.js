@@ -1,3 +1,16 @@
+// === Theme switch ===
+const root = document.documentElement;
+const themeSelect = document.getElementById('themeSelect');
+const savedTheme = localStorage.getItem('cm_theme') || 'golf';
+root.setAttribute('data-theme', savedTheme);
+if (themeSelect) {
+  themeSelect.value = savedTheme;
+  themeSelect.addEventListener('change', () => {
+    const v = themeSelect.value;
+    root.setAttribute('data-theme', v);
+    localStorage.setItem('cm_theme', v);
+  });
+}
 // Мобильное меню
 const burgerBtn = document.getElementById('burgerBtn');
 const mobileNav = document.getElementById('mobileNav');
