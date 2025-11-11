@@ -1,139 +1,81 @@
-// === Theme switch ===
-const root = document.documentElement;
-const themeSelect = document.getElementById('themeSelect');
-const savedTheme = localStorage.getItem('cm_theme') || 'golf';
-root.setAttribute('data-theme', savedTheme);
-if (themeSelect) {
-  themeSelect.value = savedTheme;
-  themeSelect.addEventListener('change', () => {
-    const v = themeSelect.value;
-    root.setAttribute('data-theme', v);
-    localStorage.setItem('cm_theme', v);
-  });
-}
-// Мобильное меню
-const burgerBtn = document.getElementById('burgerBtn');
-const mobileNav = document.getElementById('mobileNav');
-if (burgerBtn && mobileNav) {
-  burgerBtn.addEventListener('click', () => {
-    mobileNav.classList.toggle('open');
-  });
-  mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-    mobileNav.classList.remove('open');
-  }));
-}
+// год в футере
+document.getElementById('year').textContent = new Date().getFullYear();
 
-// Текущий год в футере
-document.getElementById('year').textContent = new Date().getFullYear().toString();
+// ----- DROPS -----
+const dropsGrid = document.getElementById('dropsGrid');
 
-// Статус /api/health
-(async function checkStatus(){
-  const el = document.getElementById('statusBar');
-  try{
-    const res = await fetch('/api/health');
-    if(!res.ok) throw new Error('not ok');
-    const data = await res.json();
-    el.textContent = `API: OK • ${new Date(data.ts).toLocaleString()}`;
-  }catch(e){
-    el.textContent = 'API недоступно. Попробуйте позже.';
-  }
-})();
-
-// Подгрузка рафлов
-const rafflesList = document.getElementById('rafflesList');
-function raffleCard(r){
-  const card = document.createElement('article');
-  card.className = 'card raffle-card';
-  card.innerHTML = `
-    <h3>${r.title ?? 'Релиз'}</h3>
-    <p>${r.description ?? 'Лимитированный дроп'}</p>
-    <div class="raffle-meta">
-      <span>Победителей: ${r.winners_count ?? 1}</span>
-      ${r.starts_at ? `<span>Старт: ${new Date(r.starts_at).toLocaleString()}</span>` : ''}
-      ${r.ends_at ? `<span>Финиш: ${new Date(r.ends_at).toLocaleString()}</span>` : ''}
-    </div>
+function dropCard(d){
+  const el = document.createElement('article');
+  el.className = 'drop-card';
+  el.innerHTML = `
+    <a href="#">
+      <div class="media">${imgTag(d.image_url)}</div>
+      <div class="title">${escapeHtml(d.title || 'Drop')}</div>
+      <div class="meta">${d.status || 'SOON'}</div>
+    </a>
   `;
-  return card;
+  return el;
 }
 
-(async function loadRaffles(){
+// ----- SHOP -----
+const shopGrid = document.getElementById('shopGrid');
+
+function productCard(p){
+  const el = document.createElement('article');
+  el.className = 'product-card';
+  el.innerHTML = `
+    <a href="#">
+      <div class="media">${imgTag(p.image)}</div>
+      <div class="title">${escapeHtml(p.title)}</div>
+      <div class="price">$${Number(p.price).toFixed(0)}</div>
+    </a>
+  `;
+  return el;
+}
+
+// helpers
+function imgTag(src){
+  const safe = src || 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=1000&q=80&auto=format&fit=crop';
+  return `<img src="${safe}" alt="" loading="lazy" />`;
+}
+function escapeHtml(s=''){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// load drops from /api/raffles
+(async function loadDrops(){
   try{
     const res = await fetch('/api/raffles');
-    if(!res.ok) throw new Error('not ok');
     const data = await res.json();
-    const arr = data.raffles ?? [];
-    rafflesList.innerHTML = '';
+    const arr = (data?.raffles || []).map(r => ({
+      title: r.title || 'Drop',
+      image_url: r.image_url, // если добавишь в API
+      status: r.ends_at ? 'ENDED' : (r.starts_at ? 'SOON' : 'SOON')
+    }));
+    dropsGrid.innerHTML = '';
     if(arr.length === 0){
-      const empty = document.createElement('div');
-      empty.className = 'card';
-      empty.textContent = 'Скоро добавим новые розыгрыши.';
-      rafflesList.appendChild(empty);
+      dropsGrid.innerHTML = `<div class="meta">Скоро новые дропы</div>`;
     } else {
-      arr.forEach(r => rafflesList.appendChild(raffleCard(r)));
+      arr.forEach(d => dropsGrid.appendChild(dropCard(d)));
     }
   }catch(e){
-    const err = document.createElement('div');
-    err.className = 'card';
-    err.textContent = 'Не удалось загрузить список рафлов.';
-    rafflesList.appendChild(err);
+    dropsGrid.innerHTML = `<div class="meta">Не удалось загрузить дропы</div>`;
   }
 })();
 
-// Отправка формы участия
-const form = document.getElementById('raffleForm');
-const toast = document.getElementById('toast');
-const submitBtn = document.getElementById('submitBtn');
-
-function showError(field, msg){
-  const wrap = field.closest('.field');
-  wrap.querySelector('.error').textContent = msg || '';
-}
-
-function validate(form){
-  let ok = true;
-  const name = form.elements['name'];
-  const tg = form.elements['telegram'];
-  const size = form.elements['size'];
-  showError(name,''); showError(tg,''); showError(size,'');
-
-  if(!name.value.trim()){ showError(name,'Укажи имя'); ok = false; }
-  if(!tg.value.trim() || !/^@?[A-Za-z0-9_]{5,32}$/.test(tg.value.trim())){ showError(tg,'Некорректный @username'); ok = false; }
-  if(!size.value){ showError(size,'Выбери размер'); ok = false; }
-
-  return ok;
-}
-
-if (form) {
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if(!validate(form)) return;
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Отправляем…';
-    toast.classList.remove('show');
-    try{
-      const payload = {
-        name: form.elements['name'].value.trim(),
-        telegram: form.elements['telegram'].value.trim().replace(/^@/, ''),
-        size: form.elements['size'].value,
-      };
-      const res = await fetch('/api/raffles', {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json().catch(()=> ({}));
-      if(!res.ok) throw new Error(data?.error || 'Ошибка заявки');
-
-      toast.textContent = 'Заявка отправлена! Удачи в розыгрыше ✨';
-      toast.classList.add('show');
-      form.reset();
-    }catch(err){
-      toast.textContent = 'Не удалось отправить заявку. Попробуй позже.';
-      toast.classList.add('show');
-    }finally{
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Участвовать';
+// load shop from /api/products (см. файл ниже)
+(async function loadShop(){
+  try{
+    const res = await fetch('/api/products');
+    const data = await res.json();
+    const arr = data?.products || [];
+    shopGrid.innerHTML = '';
+    if(arr.length === 0){
+      shopGrid.innerHTML = `<div class="meta">Товары скоро появятся</div>`;
+    } else {
+      arr.forEach(p => shopGrid.appendChild(productCard(p)));
     }
-  });
-}
+  }catch(e){
+    shopGrid.innerHTML = `<div class="meta">Не удалось загрузить товары</div>`;
+  }
+})();
