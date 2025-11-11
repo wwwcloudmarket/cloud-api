@@ -14,14 +14,27 @@
 <body>
   <!-- Шапка -->
   <header class="site-header">
-    <div class="container header-inner">
-      <a class="logo" href="#">Cloud<span>Market</span></a>
+<div class="container header-inner">
+  <a class="logo" href="#">Cloud<span>Market</span></a>
 
-      <nav class="nav">
-        <a href="#features">Преимущества</a>
-        <a href="#raffles">Розыгрыши</a>
-        <a href="#contacts">Контакты</a>
-      </nav>
+  <nav class="nav">
+    <a href="#features">Преимущества</a>
+    <a href="#raffles">Розыгрыши</a>
+    <a href="#contacts">Контакты</a>
+  </nav>
+
+  <div class="theme-switch">
+    <label for="themeSelect" class="sr-only">Стиль</label>
+    <select id="themeSelect" aria-label="Сменить стиль">
+      <option value="golf">GOLF</option>
+      <option value="cactus">CACTUS</option>
+    </select>
+  </div>
+
+  <button class="burger" aria-label="Открыть меню" id="burgerBtn">
+    <span></span><span></span><span></span>
+  </button>
+</div>
 
       <button class="burger" aria-label="Открыть меню" id="burgerBtn">
         <span></span><span></span><span></span>
